@@ -10,6 +10,7 @@ const _data = new Schema({
 });
 
 const sectorSchema = new Schema({
+    id: Number,
     name: String,
     data: [ _data ],
     total_expense: Number,

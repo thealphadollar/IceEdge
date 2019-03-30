@@ -14,7 +14,6 @@ const PORT = process.env.IE_PORT;
 app.use(cors());
 
 // database connection
-// moon.connect('mongodb://thealphadollar:test123@ds245715.mlab.com:45715/learn-graphql');
 moon.connect(process.env.IE_CONN);
 moon.connection.once('open', () => {
     console.log('Connection Established!');

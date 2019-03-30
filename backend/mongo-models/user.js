@@ -78,9 +78,9 @@ const _norm_time_dataSchema = new Schema({
 
 const userSchema = new Schema({
     id: Number,
-    cat_id = Number,
-    data = [ _time_dataSchema ],
-    norm_data = [ _norm_time_dataSchema ]
+    cat_id: Number,
+    data: [ _time_dataSchema ],
+    norm_data: [ _norm_time_dataSchema ]
 })
 
 module.exports = moon.model('User', userSchema);
