@@ -1,5 +1,4 @@
 const graph = require('graphql');
-const lodash = require('lodash');
 const User = require("../mongo-models/user");
 const Sector = require("../mongo-models/sector");
 const Category = require("../mongo-models/cat_users");
@@ -106,8 +105,17 @@ const UserType = new GraphQLObjectType({
     fields: () => ({
         id: {type: GraphQLID},
         cat_id: {type: GraphQLID},
-        // TODO: Implement search based on month
-        data: { type: GraphQLList(TimeDataType)},
+        data: { 
+            type: new GraphQLList(TimeDataType),
+            resolve (parent, args){
+                raw_result = User.find({
+                    id: parent.id,
+                    "data.month": args.month,
+                    "data.year": args.year
+                });
+                return raw_result.data;
+            }
+        },
         norm_data: {type: GraphQLList(NormTimeDataType)}
     })
 });
@@ -140,7 +148,7 @@ const CategoryType = new GraphQLObjectType({
         id: {type: GraphQLID},
         name: {type: GraphQLString},
         numUsers: {type: GraphQLInt},
-        userIDs: {type: GraphQLList (GraphQLInt)},
+        users: {type: GraphQLList (UserType)},
         desc: {type: GraphQLString}
     })
 })
@@ -148,10 +156,12 @@ const CategoryType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
     name:'RootQueryType',
     fields:{
-        user: {
+        customer: {
             type: UserType,
             args: {
-                id: {type: GraphQLID}
+                id: {type: GraphQLID},
+                month: {type: GraphQLInt},
+                year: {type: GraphQLInt}
             },
             resolve(parent, args){
                 return User.findById(args.id);
@@ -175,7 +185,7 @@ const RootQuery = new GraphQLObjectType({
                 return Category.findById(args.id);
             }
         },
-        users: {
+        customers: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
                 return User.find({});
@@ -189,6 +199,9 @@ const RootQuery = new GraphQLObjectType({
         },
         categories: {
             type: new GraphQLList(CategoryType),
+            args: {
+                limit: GraphQLInt
+            },
             resolve(parent, args){
                 return Category.find({});
             }
